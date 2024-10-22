@@ -1,0 +1,25 @@
+use std::io;
+
+fn simple_array_sum(ar: &[i32]) -> i32 {
+    ar.iter().sum()
+}
+
+fn main() {
+    // Read the size of the array
+    let mut size_input = String::new();
+    io::stdin().read_line(&mut size_input).expect("Error reading line");
+    let size: usize = size_input.trim().parse().expect("Please enter a number");
+
+    // Read the array elements
+    let mut array_input = String::new();
+    io::stdin().read_line(&mut array_input).expect("Error reading line");
+    let ar: Vec<i32> = array_input
+        .trim()
+        .split_whitespace()
+        .map(|x| x.parse().expect("Please enter a valid integer"))
+        .collect();
+
+    // Call the function and print the result
+    let result = simple_array_sum(&ar);
+    println!("{}", result);
+}
