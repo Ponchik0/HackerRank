@@ -2,17 +2,25 @@ use std::env;
 use std::fs::File;
 use std::io::{self, BufRead, Write};
 
-fn diagonal_difference(arr: &[Vec<i32>]) -> i32 {
-    let n = arr.len();
-    let mut primary_diagonal = 0;
-    let mut secondary_diagonal = 0;
+/*
+ * Complete the 'plus_minus' function below.
+ *
+ * The function accepts INTEGER_ARRAY arr as parameter.
+ */
 
-    for i in 0..n {
-        primary_diagonal += arr[i][i];
-        secondary_diagonal += arr[i][n - 1 - i];
-    }
+fn plus_minus(arr: &[i32], fptr: &mut File) {
+    let n = arr.len() as f64;
+    let positive_count = arr.iter().filter(|&&x| x > 0).count() as f64;
+    let negative_count = arr.iter().filter(|&&x| x < 0).count() as f64;
+    let zero_count = arr.iter().filter(|&&x| x == 0).count() as f64;
 
-    (primary_diagonal - secondary_diagonal).abs()
+    let positive_ratio = positive_count / n;
+    let negative_ratio = negative_count / n;
+    let zero_ratio = zero_count / n;
+
+    writeln!(fptr, "{:.6}", positive_ratio).ok();
+    writeln!(fptr, "{:.6}", negative_ratio).ok();
+    writeln!(fptr, "{:.6}", zero_ratio).ok();
 }
 
 fn main() {
@@ -21,20 +29,14 @@ fn main() {
 
     let mut fptr = File::create(env::var("OUTPUT_PATH").unwrap()).unwrap();
 
-    let n = stdin_iterator.next().unwrap().unwrap().trim().parse::<usize>().unwrap();
+    let _n: usize = stdin_iterator.next().unwrap().unwrap().trim().parse().unwrap();
 
-    let mut arr: Vec<Vec<i32>> = Vec::with_capacity(n);
+    let arr: Vec<i32> = stdin_iterator.next().unwrap().unwrap()
+        .trim_end()
+        .split_whitespace()
+        .map(|s| s.parse::<i32>().unwrap())
+        .collect();
 
-    for _ in 0..n {
-        let row: Vec<i32> = stdin_iterator.next().unwrap().unwrap()
-            .trim()
-            .split_whitespace()
-            .map(|s| s.parse::<i32>().unwrap())
-            .collect();
-        arr.push(row);
-    }
-
-    let result = diagonal_difference(&arr);
-
-    writeln!(&mut fptr, "{}", result).unwrap();
+    // Call the plus_minus function
+    plus_minus(&arr, &mut fptr);
 }
