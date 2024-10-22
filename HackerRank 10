@@ -1,0 +1,46 @@
+use std::env;
+use std::fs::File;
+use std::io::{self, BufRead, Write};
+
+/*
+ * Complete the 'gradingStudents' function below.
+ *
+ * The function is expected to return a vector of integers.
+ * The function accepts a vector of integers grades as parameter.
+ */
+
+fn gradingStudents(grades: Vec<i32>) -> Vec<i32> {
+    grades.into_iter().map(|grade| {
+        if grade < 38 {
+            grade // No rounding for grades below 38
+        } else {
+            let next_multiple_of_5 = ((grade / 5) + 1) * 5;
+            if next_multiple_of_5 - grade < 3 {
+                next_multiple_of_5 // Round up to the next multiple of 5
+            } else {
+                grade // No rounding
+            }
+        }
+    }).collect()
+}
+
+fn main() {
+    let stdin = io::stdin();
+    let mut stdin_iterator = stdin.lock().lines();
+
+    let mut fptr = File::create(env::var("OUTPUT_PATH").unwrap()).unwrap();
+
+    let n: usize = stdin_iterator.next().unwrap().unwrap().parse().unwrap();
+    let mut grades = Vec::new();
+
+    for _ in 0..n {
+        let grade: i32 = stdin_iterator.next().unwrap().unwrap().parse().unwrap();
+        grades.push(grade);
+    }
+
+    let result = gradingStudents(grades);
+
+    for grade in result {
+        writeln!(&mut fptr, "{}", grade).ok();
+    }
+}
