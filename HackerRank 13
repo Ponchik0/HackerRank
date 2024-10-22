@@ -1,0 +1,72 @@
+use std::env;
+use std::fs::File;
+use std::io::{self, BufRead, Write};
+
+fn gcd(a: i32, b: i32) -> i32 {
+    if b == 0 {
+        a
+    } else {
+        gcd(b, a % b)
+    }
+}
+
+fn lcm(a: i32, b: i32) -> i32 {
+    (a / gcd(a, b)) * b  // Prevent overflow
+}
+
+fn lcm_of_list(numbers: &[i32]) -> i32 {
+    numbers.iter().cloned().reduce(lcm).unwrap()
+}
+
+fn gcd_of_list(numbers: &[i32]) -> i32 {
+    numbers.iter().cloned().reduce(gcd).unwrap()
+}
+
+fn get_total_x(a: Vec<i32>, b: Vec<i32>) -> i32 {
+    let lcm_a = lcm_of_list(&a);
+    let gcd_b = gcd_of_list(&b);
+    
+    // Count multiples of lcm_a that are <= gcd_b
+    let mut count = 0;
+    let mut multiple = lcm_a;
+
+    while multiple <= gcd_b {
+        count += 1;
+        multiple += lcm_a; // Move to the next multiple
+    }
+
+    count
+}
+
+fn main() {
+    let stdin = io::stdin();
+    let mut stdin_iterator = stdin.lock().lines();
+
+    let first_line: Vec<i32> = stdin_iterator.next().unwrap().unwrap()
+        .split_whitespace()
+        .map(|x| x.parse().unwrap())
+        .collect();
+
+    let n = first_line[0] as usize; // number of elements in set A
+    let m = first_line[1] as usize; // number of elements in set B
+
+    let a: Vec<i32> = stdin_iterator.next().unwrap().unwrap()
+        .split_whitespace()
+        .map(|x| x.parse().unwrap())
+        .collect();
+
+    let b: Vec<i32> = stdin_iterator.next().unwrap().unwrap()
+        .split_whitespace()
+        .map(|x| x.parse().unwrap())
+        .collect();
+
+    if a.len() != n || b.len() != m {
+        eprintln!("Error: The number of elements in sets A or B does not match the specified counts.");
+        return;
+    }
+
+    let total_x = get_total_x(a, b);
+
+    let mut fptr = File::create(env::var("OUTPUT_PATH").unwrap()).unwrap();
+    writeln!(&mut fptr, "{}", total_x).ok();
+}
